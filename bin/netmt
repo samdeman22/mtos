@@ -1,0 +1,11 @@
+-- NETMT BACKGROUND DAEMON
+
+local std = require("std")
+local rap = require("rap")
+local nhandle = require("nhandle")
+local ntable = require("ntable")
+
+--upon getting SEEK
+--  if its for nobody, and the last node has less authority than this node, send back "mt"
+
+--upon getting ACK

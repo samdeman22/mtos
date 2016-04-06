@@ -1,0 +1,90 @@
+--Package manager
+-- Usage: pacman <update|upgrade|install|remove|clean|add-repository|remove-repository>
+
+local serial = require("serialization")
+local fs = require("filesystem")
+local nhandle = require("nhandle")
+
+local args = {...}
+local cache = {}
+local port = 123 --decide on a port for pacman, 0 and 1 are reserved for ntable and dns
+
+--load the list of repository sources from /etc/pacman/sources
+local function loadSources()
+  if not fs.exists("/etc/pacman/sources") then return nil end
+  local f = fs.open("/etc/pacman/sources")
+  local t = serial.serialize(f:read(fs.size("/etc/pacman/sources")))
+  return t
+end
+
+--load the local cache from /var/pacman/cache
+local function loadCache()
+  if not fs.exists("/var/pacman/cache") then return nil end
+  local f = fs.open("/var/pacman/cache")
+  local t = serial.serialize(f:read(fs.size("/var/pacman/cache")))
+  return t
+end
+
+local function saveCache(arr)
+  if not fs.exists("/var/pacman") then fs.makeDirectory("/var/pacman") end
+  local f = fs.open("/var/pacman/cache", "w")
+  f:write(serial.unserialize(arr))
+  f:close()
+end
+
+local function update()
+  --send an update request to all of the sources
+end
+
+local function upgrade()
+  
+end
+
+local function install(name)
+  
+end
+
+local function contains(arr, value)
+  for i = 1,#arr do
+    if arr[i] == value then return i end
+  end
+  return false
+end
+
+--main running of pacman
+if #args > 0 then
+  local opt = args[1]
+  local flag = nil
+  local name = nil
+  local n = contains(args, "--upgrade")
+  
+  --find the flag and the name
+  if not n then
+    name = args[2]
+  elseif n and n == 3 then
+    name = args[2]
+    flag = "--upgrade"
+  elseif n == 2 then
+    name = args[3]
+    flag = "--upgrade"
+  end
+  
+  if opt == "update" then
+    update()
+  elseif opt == "install" then
+    if flag == "--upgrade" then
+      upgrade(name)
+    else
+      install(name)
+    end
+  elseif opt == "remove" then
+    remove(name)
+  elseif opt == "clean" then
+    clean()
+  else
+    error("no option "..opt.."\nUsage: pacman <update|upgrade|install|remove|clean> [packagename|repository] [options]")
+  end
+  
+else
+  error("Usage: pacman <update|upgrade|install|remove|clean> [packagename|repository] [options]")
+end

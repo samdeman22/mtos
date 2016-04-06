@@ -1,0 +1,19 @@
+-- NETEX BACKGROUND DAEMON
+
+local std = require("std")
+local rap = require("rap")
+local nhandle = require("nhandle")
+local ntable = require("ntable")
+local component = require("component")
+
+ntable.load()
+ntable.update("ex", component.modem.address)
+ntable.update("mt", component.modem.address)
+ntable.update("me", component.modem.address)
+ntable.save()
+
+--upon getting SEEK
+-- relay the the request to the destination with the 
+
+--upon getting DFLT
+-- send back ex
