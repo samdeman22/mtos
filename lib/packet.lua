@@ -1,18 +1,16 @@
 --          PACKET API
---
+-- Functions for the forming of packet tables, with convenient (un)serialization
 
 local serial = require("serialization")
 
 local packet = {}
 packet.__index = packet
 
-function packet.create(from, path, content, protocol)
+function packet.create(src, dst, content)
   local pak = {}
-  pak.from = from
-  pak.path = path
+  pak.from = src
+  pak.dst = dst
   pak.content = content
-  --optional protocol
-  pak.protocol = protocol
   return pak
 end
 
@@ -23,10 +21,9 @@ end
 
 function packet:serialize()
   local t = {}
-  t.from = self.from
-  t.path = self.path
+  t.from = self.src
+  t.dst = self.dst
   t.content = self.content
-  t.protocol = self.protocol
   return serial.serialize(t)
 end
 

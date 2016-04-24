@@ -1,6 +1,5 @@
-          --MT NETHANDLE API--
---Specially for more easily handling messages over modem
---
+--          MT NETHANDLE API--
+-- built on top of modem for easier networking
 
 local component = require("component")
 local event = require("event")
@@ -22,22 +21,12 @@ function nhandle.create(port, handle)
   return nh
 end
 
-function nhandle:send(addr, port, message)
-  local out = nil
-  if type(message) == "table" then
-    out = serial.serialize(message)
-  elseif type(message) == "string" then
-    out = message
-  else
-    error("expected either a string or table for message in nhandle.send")
-  end
-  
-  if _G["NET"]
-  self.modem.send()
-end
-
 --should be overriden by implementation to do as desired
-function nhandle:handle(remote, port, message, remotePublic) print("unimplemented handler") end
+function nhandle:handle(src, port, message) error("unimplemented handler") end
+
+function nhandle:send(addr, port, ...)
+  self.modem.send(addr, port, arg)
+end
 
 --start the accepting loop, will call the provided handler on the client packet
 --will end when self.accepting is set to false
@@ -48,19 +37,15 @@ function nhandle:accept()
   print("nethandler: accepting on "..self.port)
  
   while self.accepting do
-    
     print("waiting for clients")
     --blocking call, wait for client messages
-    local event, remote, port, _, message, remotePublic= event.pull("modem_message")
-    
+    local event, src, port, _, message = event.pull("modem_message")
     --start a coroutine to handle the client
     local cr = coroutine.create(function() 
-      self:handle(remote, port, message, remotePublic)
+      self:handle(src, port, message)
       coroutine.yield()
     end)
-    
     coroutine.resume(cr)
-
   end
 end
 

@@ -23,7 +23,7 @@ function rap.alpha(n)
   return (n >= 0 and n <= 25) and string.char(string.byte("a") + n) or nil
 end
 
---convert base 10 to base 26 alphabet string
+--convert base10 to base26 alphabet string
 function rap.base26(n, length)
   --shortcut this solution
   if n == 0 then return "a" end
