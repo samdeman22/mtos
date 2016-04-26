@@ -76,7 +76,7 @@ function ntable.remove(entry)
 end
 
 function ntable.contains(addr)
-  for k v in pairs(_G["NET"]) do
+  for k, v in pairs(_G["NET"]) do
     if v == addr then return true end
   end
   return false

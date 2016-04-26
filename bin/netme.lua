@@ -29,16 +29,50 @@ local nh = nhandle.create(std.ports.NET, function(self, src, port, message) --on
   end
 end)
 
--- other processes can pause/resume netme listening by setting the flag
-_G["FLAG"].NETME_LISTEN = true
+local running = false
 
---main process
-while true do
-  if _G["FLAG"].NETME_LISTEN then
-    local cr = coroutine.create(function() nh:accept(); coroutine.yield() end)
-    coroutine.resume(cr)
-  else
-    --will stop the nethandle and cause the coroutine to yield
-    nh.accepting = false
+--define main running routine
+local function main
+  ntable.load()
+  while running do
+    if not nh.accepting and _G["FLAG"].NETME_LISTEN then
+      nh:accept();
+    else
+      --will stop the nethandle and cause the coroutine to yield
+      nh.accepting = false
+    end
   end
+  ntable.save()
+  coroutine.yield()
+end
+
+local cr = coroutine.create(main)
+
+--global functions for usage in RC
+function start()
+  _G["FLAG"].NETME_LISTEN = true
+  running = true
+  coroutine.resume(cr)
+end
+
+--pause listening but keep
+function pause()
+  _G["FLAG"].NETME_LISTEN = false
+end
+
+function continue()
+  _G["FLAG"].NETME_LISTEN = true
+end
+
+function stop()
+  _G["FLAG"].NETME_LISTEN = false
+  running = false
+end
+
+function save()
+  ntable.save()
+end
+
+function flush()
+  ntable.flush()
 end

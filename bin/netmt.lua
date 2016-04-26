@@ -28,7 +28,7 @@ _G["FLAG"].NETMT_LISTEN = true
 
 --main process
 while true do
-  if _G["FLAG"].NETMT_LISTEN then
+  if not nh.accepting and _G["FLAG"].NETMT_LISTEN then
     local cr = coroutine.create(function() nh:accept(); coroutine.yield() end)
     coroutine.resume(cr)
   else
