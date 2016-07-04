@@ -38,7 +38,7 @@ function rap.base26(n, length)
     digits[i] = rem
     i = i + 1
   end
-  
+
   --construct the string based on the digits
   local output = ""
   for i = 1, #digits do
@@ -51,7 +51,7 @@ function rap.base26(n, length)
       output = "a"..output
     end
   end
-  
+
   return output
 end
 
@@ -85,13 +85,13 @@ function rap.fromstring(str)
   subcount = subcount + 1
   local subnets = {}
   local groups = {}
-  
+
   local i = 1
   for net in str:gmatch("([^:]+)") do
     groups[i] = net
     i = i + 1
   end
-  
+
   if subcount ~= #groups or #groups <= 0 then
     error("string "..str.." is not a valid RAP address")
   end
@@ -138,18 +138,8 @@ function rap:tostring()
   return out
 end
 
---add the subnets of the address to the head (left) of self
+--add the subnets of the address to the head (right) of self
 function rap:append(address)
-  if address then
-    for i = #self.subnets + 1, #self.subnets + #address + 1 do
-      self.subnets[i] = address[i]
-    end
-  end
-  return self
-end
-
---add the subnets of address to the tail (right) of self
-function rap:prepend(address)
   if address then
     --move the self address along in index
     for i = #self.subnets, 1 do
@@ -162,20 +152,18 @@ function rap:prepend(address)
   return self
 end
 
---take n subnets from the head (left) of the address, return a new rap of them
-function rap:head(n)
-  local n = (n and n > 1) and n or 1
-  local r = rap.create({})
-  if self.subnets then
-    for i = 1, n do
-      r.subnets[i] = self.subnets[i]
-    end
+--add the subnets of address to the tail (left) of self
+function rap:prepend(address)
+if address then
+  for i = #self.subnets + 1, #self.subnets + #address + 1 do
+    self.subnets[i] = address[i]
   end
-  return r
+end
+return self
 end
 
---take n subnets from the tail (right) of the address, return a new rap of them
-function rap:tail(n)
+--take n subnets from the head (right) of the address, return a new rap of them
+function rap:head(n)
   local n = (n and n > 1) and n or 1
   local r = rap.create({})
   local j = 1
@@ -183,6 +171,18 @@ function rap:tail(n)
     for i = #self.subnets - n, #self.subnets do
       r.subnets[j] = self.subnets[i]
       j = j + 1
+    end
+  end
+  return r
+end
+
+--take n subnets from the tail (left) of the address, return a new rap of them
+function rap:tail(n)
+  local n = (n and n > 1) and n or 1
+  local r = rap.create({})
+  if self.subnets then
+    for i = 1, n do
+      r.subnets[i] = self.subnets[i]
     end
   end
   return r
