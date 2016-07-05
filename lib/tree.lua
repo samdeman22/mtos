@@ -28,5 +28,3 @@ function tree:traverse(f)
     v:traverse(f)
   end
 end
-
-function tree:
