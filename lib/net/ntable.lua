@@ -3,7 +3,7 @@
 
 local std = require("std")
 local rap = require("rap")
-local nhandle = require("nhandle")
+local nhandle = require("net/nhandle")
 local fs = require("filesystem")
 local serial = require("serialization")
 

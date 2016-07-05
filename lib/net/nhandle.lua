@@ -4,7 +4,7 @@
 local component = require("component")
 local event = require("event")
 local serial = require("serialization")
-local packet = require("packet")
+local packet = require("net/packet")
 
 local nhandle = {}
 
@@ -37,7 +37,7 @@ function nhandle:accept()
     --blocking call, wait for client messages
     local event, src, port, _, message = event.pull("modem_message")
     --start a coroutine to handle the client
-    local cr = coroutine.create(function() 
+    local cr = coroutine.create(function()
       self:handle(src, port, message)
       coroutine.yield()
     end)

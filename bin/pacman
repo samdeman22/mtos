@@ -3,7 +3,7 @@
 
 local serial = require("serialization")
 local fs = require("filesystem")
-local nhandle = require("nhandle")
+local nhandle = require("net/nhandle")
 
 local args = {...}
 local cache = {}
@@ -37,11 +37,11 @@ local function update()
 end
 
 local function upgrade()
-  
+
 end
 
 local function install(name)
-  
+
 end
 
 local function contains(arr, value)
@@ -57,7 +57,7 @@ if #args > 0 then
   local flag = nil
   local name = nil
   local n = contains(args, "--upgrade")
-  
+
   --find the flag and the name
   if not n then
     name = args[2]
@@ -68,7 +68,7 @@ if #args > 0 then
     name = args[3]
     flag = "--upgrade"
   end
-  
+
   if opt == "update" then
     update()
   elseif opt == "install" then
@@ -84,7 +84,7 @@ if #args > 0 then
   else
     error("no option "..opt.."\nUsage: pacman <update|upgrade|install|remove|clean> [packagename|repository] [options]")
   end
-  
+
 else
   error("Usage: pacman <update|upgrade|install|remove|clean> [packagename|repository] [options]")
 end
