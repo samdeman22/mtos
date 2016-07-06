@@ -1,0 +1,6 @@
+\type{man}
+\insert[man/page]\title{MT NET API}
+\section[preamble]{
+Exposes the features necessary to define the 'net-layer' of the MT hierarchical network stack
+}
+\insert[man-index]

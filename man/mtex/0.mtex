@@ -1,0 +1,5 @@
+\type{man}
+\insert[man/page]\title{MetaTex}
+\section[preamble]{
+MetaTex is a basic, but powerful, text formatting and templating engine.
+}
