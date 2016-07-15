@@ -13,8 +13,8 @@ local ntable = {}
 --global environment net table
 if not _G["NET"] then _G["NET"] = {table = {}} end
 
-function ntable.init(ex, mt, me, table)
-  _G["NET"] = {["ex"] = ex, ["mt"] = mt, ["me"] = me, ["table"] = table}
+function ntable.init(mt, ex, me, table)
+  _G["NET"] = {["mt"] = mt, ["ex"] = ex, ["me"] = me, ["table"] = table}
 end
 
 --loads the NET table from /var/NET, sets the global table and returns it; if it exists
