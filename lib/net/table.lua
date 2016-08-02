@@ -8,12 +8,16 @@ local serial = require("serialization")
 
 --API table
 local ntable = {}
+local default = {["table"] = {}}
 
 --global environment net table
-if not _G["NET"] then _G["NET"] = {table = {}} end
+if not _G["NET"] then _G["NET"] = default end
 
-function ntable.init(mt, ex, me, table)
-  _G["NET"] = {["mt"] = mt, ["ex"] = ex, ["me"] = me, ["table"] = table}
+--me, ex and mt are special aliases
+--me contains the rap head that represents this machine's subnet address
+--ex contains the
+function ntable.init(ex, me, table)
+  _G["NET"] = {["ex"] = ex, ["me"] = me, ["table"] = table}
 end
 
 --loads the NET table from /var/NET, sets the global table and returns it; if it exists
@@ -36,26 +40,24 @@ end
 -- get hard address from NET table based on entry
 -- expect entry as either: "ex", "mt", "me"; or an arbitrary string/number
 function ntable.get(entry)
-  if entry == "ex" or entry == "mt" or entry == "me"
-  or entry == 127 or entry == 331 or entry == 316 then
-    return _G["NET"][entry]
-  elseif type(entry) == "string" then
-    return _G["NET"].table[rap.base10(entry)]
-  elseif type(entry) == "number" then
-    return _G["NET"].table[entry]
+  local n = (type(entry) == "number" and entry)
+        or (type(entry) == "string" and rap.base10(entry))
+  if n == std.me or n == std.ex or n == std.mt then
+    return _G["NET"][n]
   else
-    return nil
+    return _G["NET"].table[n]
   end
 end
 
 --
 function ntable.update(entry, value)
-  if entry == "ex" or entry == "mt" or entry == "me"
-  or entry == 127 or entry == 331 or entry == 316 then
-    _G["NET"][entry] = value
+  local n = (type(entry) == "number" and entry)
+        or (type(entry) == "string" and rap.base10(entry))
+  if n == std.me or n == std.ex or n == std.mt then
+    _G["NET"][n] = value
     return true
   elseif entry then
-    _G["NET"].table[rap.base10(entry)] = value
+    _G["NET"].table[n] = value
     return true
   else
     return false
@@ -82,7 +84,22 @@ function ntable.contains(addr)
 end
 
 function ntable.flush()
-  _G["NET"] = {["table"] = {}}
+  _G["NET"] = default
+end
+
+--take out loops, duplicate 'mt's and 'me's etc.
+--TODO
+function simplify_rap(r)
+  local r = r
+  if not r then return nil end
+  for i = #r.subnets, 1, -1 do
+    if r.subnets[i] = std.mt then
+      --take everything from the right of here inclusive
+      local s = r:head(i)
+    end
+
+  end
+  return r
 end
 
 return ntable
