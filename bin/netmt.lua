@@ -3,8 +3,8 @@
 
 --imports
 local std = require("std")
-local ntable = require("net/ntable")
-local nhandle = require("net/nhandle")
+local ntable = require("net/table")
+local nhandle = require("net/handle")
 local coroutine = require("coroutine")
 
 --recieving messages on the NET port
