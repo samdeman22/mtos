@@ -26,7 +26,7 @@ end
 --convert base10 to base26 alphabet string
 function rap.base26(n, length)
   --shortcut this solution
-  if n == 0 then return "a" end
+  if n == 0 then return leadingzeroes("a", length) end
 
   --otherwise get the coefficients of each digit
   local num = n
@@ -47,12 +47,19 @@ function rap.base26(n, length)
 
   --if the output sequence has less digits than the format length, prepend zeroes
   if length and length > 1 and #output < length then
-    for i = 1, length - #output do
-      output = "a"..output
-    end
+    output = leadingzeroes(output, length)
   end
-
   return output
+end
+
+--helper for base26 string formatting
+function leadingzeroes(r, n)
+  local r = r or "a"
+  local n = n or 0
+  for i = 1, n - #r do
+    r = "a"..r
+  end
+  return r
 end
 
 --convert base26 alphabet string to base10
@@ -130,7 +137,7 @@ end
 --member functions
 --tostring
 function rap:tostring()
-  local out = rap.base26(self.subnets[1])
+  local out = rap.base26(self.subnets[1], 2)
   for i = 2, #self.subnets do
     out = out..":"..rap.base26(self.subnets[i], 2)
   end
