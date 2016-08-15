@@ -1,4 +1,4 @@
---          MT MODEM HANDLING API--
+--          MT NET SOCKET API
 -- built on top of modem for slightly easier networking
 
 local component = require("component")

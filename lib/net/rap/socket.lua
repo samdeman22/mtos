@@ -1,4 +1,4 @@
---          MT NET-HANDLE API
+--          MT RAP SOCKET API
 -- built on top of modhandle, RAP and NET for easy rap-level networking
 
 local serial = require("serialization")
