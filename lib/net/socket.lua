@@ -28,5 +28,9 @@ function socket:send(addr, port, ...)
   srv:accept_sync()
 end
 
+function socket:fire(addr, port, ...)
+  self.modem.send(addr, port, arg)
+end
+
 socket.__index = socket
 return socket
