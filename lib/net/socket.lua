@@ -12,7 +12,7 @@ local socket = {}
 --constructor
 function socket.create(addr, port, handle)
   local s = {}
-  setmetatable(s, nhandle)
+  setmetatable(s, socket)
   s.port = port
   s.handle = handle
   s.modem = component.modem
