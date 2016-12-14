@@ -53,7 +53,7 @@ function rap.base26(n, length)
 end
 
 --helper for base26 string formatting
-function leadingzeroes(r, n)
+local function leadingzeroes(r, n)
   local r = r or "a"
   local n = n or 0
   for i = 1, n - #r do
