@@ -159,12 +159,17 @@ end
 
 --add the subnets of address to the tail (left) of self
 function rap:prepend(address)
-if address then
-  for i = #self.subnets + 1, #self.subnets + #address + 1 do
-    self.subnets[i] = address[i]
+  if address and address.subnets then
+    --move the self address along in index
+    otherlen = #address.subnets
+    for i = #self.subnets, 1, -1 do
+      self.subnets[i + otherlen] = self.subnets[i]
+    end
+    for i = 1, #address.subnets do
+      self.subnets[i] = address.subnets[i]
+    end
   end
-end
-return self
+  return self
 end
 
 --take n subnets from the head (right) of the address, return a new rap of them
