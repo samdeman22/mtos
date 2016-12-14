@@ -175,7 +175,7 @@ function rap:head(n)
   local r = rap.create({})
   local j = 1
   if self.subnets then
-    for i = #self.subnets - n, #self.subnets do
+    for i = #self.subnets - n + 1, #self.subnets do
       r.subnets[j] = self.subnets[i]
       j = j + 1
     end
