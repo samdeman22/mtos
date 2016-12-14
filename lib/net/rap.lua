@@ -145,13 +145,10 @@ end
 
 --add the subnets of the address to the head (right) of self
 function rap:append(address)
-  if address then
-    --move the self address along in index
-    for i = #self.subnets, 1 do
-      self.subnets[i + #address] = self.subnets[i]
-    end
-    for i = 0, #address do
-      self.subnets[i] = address[i]
+  if address and address.subnets then
+    thislen = #self.subnets
+    for i = 1, #address.subnets do
+      self.subnets[i + thislen] = address.subnets[i]
     end
   end
   return self
