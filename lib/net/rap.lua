@@ -87,6 +87,8 @@ function rap.fromarray(arr)
 end
 
 function rap.fromstring(str)
+  assert(str, "argument to fromstring is nil!")
+  assert(type(str) == "string", "expected argument to fromstring to be string")
   local r = {}
   local _, subcount = string.gsub(str, ":", "")
   subcount = subcount + 1
@@ -98,10 +100,7 @@ function rap.fromstring(str)
     groups[i] = net
     i = i + 1
   end
-
-  if subcount ~= #groups or #groups <= 0 then
-    error("string "..str.." is not a valid RAP address")
-  end
+  assert(subcount == #groups or #groups > 0, "string "..str.." is not a valid RAP address")
 
   --then check and convert each subnet string
   --this is horrible, but needs to be done as lua has a crap regex implementation
