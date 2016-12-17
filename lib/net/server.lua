@@ -5,7 +5,6 @@
 local component = require("component")
 local event = require("event")
 local serial = require("serialization")
-local std = require("std").net.server
 local util_values = require("util/values")
 
 local server = {}
