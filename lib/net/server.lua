@@ -15,7 +15,7 @@ function server.create(port, handle)
   s.port = port
   s.handle = handle
   --bind the callback to the implementation defined handler
-  s.callback = function (_, _, src, port, _, message) s.handle(src,port,message) end
+  s.callback = function (_, _, src, port, _, message) s:handle(src,port,message) end
   s.modem = component.modem
   return s
 end
@@ -27,24 +27,23 @@ function server:send(addr, port, ...)
   self.modem.send(addr, port, arg)
 end
 
---start the accepting loop, will call the provided handler on the client packet
---will end when self.accepting is set to false
+--start listening; will call the provided handler on the client message
+--will end when once a client message has been dealt with
 function server:accept_sync(timeout)
-  self.modem.open(self.port)
-  --print("waiting for clients")
   --blocking call, wait for client messages
   if timeout then
     local event, _, src, port, _, message = event.pull(timeout, "modem_message")
     if event then
+      --print(message.." from "..src.." on port "..port)
       self:handle(src, port, message)
     else
       --todo timeout
     end
   else
-    local event, _, src, port, _, message = event.pull(nil, "modem_message")
+    local _, _, src, port, _, message = event.pull("modem_message")
+    --print(message.." from "..src.." on port "..port)
     self:handle(src, port, message)
   end
-  self.modem.close(self.port)
 end
 
 function server:accept_async()
@@ -57,9 +56,19 @@ end
 --unregister the event listener for modem_message on this callback
 --only this server should have the self:callback reference, others' callback hash
 --should be different.
-function server:close_async()
+function server:stop_async()
   event.ignore("modem_message", self.callback)
-  self.modem.close(self.port)
+  self:close()
+end
+
+--open port for server to listen on
+function server:open()
+  return self.modem.open(self.port)
+end
+
+--close port for server to listen on
+function server:close()
+  return self.modem.close(self.port)
 end
 
 return server
