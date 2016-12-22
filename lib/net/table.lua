@@ -2,7 +2,7 @@
 -- api to access and interact with the global NET table
 
 local std = require("std")
-local rap = require("rap")
+local rap = require("net/rap")
 local fs = require("filesystem")
 local serial = require("serialization")
 
@@ -11,7 +11,7 @@ local ntable = {}
 local default = {["table"] = {}}
 
 --global environment net table
-if not _G["NET"] then _G["NET"] = default end
+if not _G["NET"] then _G["NET"] = {} end
 
 --me, ex and mt are special aliases
 --me contains the rap head that represents this machine's subnet address
@@ -26,7 +26,7 @@ function ntable.load()
   local f = fs.open("/var/NET")
   local t = serial.unserialize(f:read(fs.size("/var/NET")))
   if not t then error("failed to deserialize net table") end
-  _G["NET"].table = t
+  _G["NET"] = t
   return t
 end
 
@@ -42,35 +42,28 @@ end
 function ntable.get(entry)
   local n = (type(entry) == "number" and entry)
         or (type(entry) == "string" and rap.base10(entry))
-  if n == std.me or n == std.ex or n == std.mt then
+  if entry then
     return _G["NET"][n]
-  else
-    return _G["NET"].table[n]
   end
+  return false
 end
 
 --
 function ntable.update(entry, value)
   local n = (type(entry) == "number" and entry)
         or (type(entry) == "string" and rap.base10(entry))
-  if n == std.me or n == std.ex or n == std.mt then
+  if entry then
     _G["NET"][n] = value
     return true
-  elseif entry then
-    _G["NET"].table[n] = value
-    return true
-  else
-    return false
   end
+  return false
 end
 
 function ntable.remove(entry)
-  local v = rap.base10(entry)
-  if _G["NET"][entry] then
-    _G["NET"][entry] = nil
-    return true
-  elseif _G["NET"].table[v] then
-    _G["NET"].table[v] = nil
+  local n = (type(entry) == "number" and entry)
+        or (type(entry) == "string" and rap.base10(entry))
+  if _G["NET"][n] then
+    _G["NET"][n] = nil
     return true
   end
   return false
@@ -84,7 +77,7 @@ function ntable.contains(addr)
 end
 
 function ntable.flush()
-  _G["NET"] = default
+  _G["NET"] = {table = {}}
 end
 
 --take out loops, duplicate 'mt's and 'me's etc.
@@ -93,7 +86,7 @@ function simplify_rap(r)
   local r = r
   if not r then return nil end
   for i = #r.subnets, 1, -1 do
-    if r.subnets[i] = std.mt then
+    if r.subnets[i] == std.mt then
       --take everything from the right of here inclusive
       local s = r:head(i)
     end
