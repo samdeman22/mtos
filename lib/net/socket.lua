@@ -39,12 +39,12 @@ function socket:fire(...)
 end
 
 --open port for socket to listen on
-function server:open()
+function socket:open()
   return self.modem.open(self.port)
 end
 
 --close port for socket to listen on
-function server:close()
+function socket:close()
   return self.modem.close(self.port)
 end
 
