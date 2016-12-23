@@ -13,23 +13,39 @@ local socket = {}
 function socket.create(addr, port, handle)
   local s = {}
   setmetatable(s, socket)
+  s.addr = addr
   s.port = port
-  s.handle = handle
+  s.handle = function(self, src, port, msg)
+    ser = serial.unserialize(msg)
+    assert(handle and typeof(handle) == "function", "expected a function of (self, src, port, message) for handle, got "..tostring(handle))
+    handle(self, ser and ser or msg)
+  end
+  assert(component.modem, "no modem found to create socket!")
   s.modem = component.modem
   return s
 end
 
---should be overriden by implementation to do as desired
-function socket:handle(src, port, message) error("unimplemented server handler in socket "..self) end
-
-function socket:send(addr, port, ...)
-  self.modem.send(addr, port, arg)
-  srv = server.create(port, handle)
+--send the serialized contents of extra arguments and wait for response
+--the response is dealt with by the defined handler
+function socket:send(...)
+  self.modem.send(self.addr, self.port, serial.serialize(arg))
+  srv = server.create(port, function(slf, src, port, msg) self.handle(src, port, msg) end)
   srv:accept_sync()
 end
 
-function socket:fire(addr, port, ...)
-  self.modem.send(addr, port, arg)
+--send the serialized contents of extra arguments and forget
+function socket:fire(...)
+  self.modem.send(self.addr, self.port, serial.serialize(arg))
+end
+
+--open port for socket to listen on
+function server:open()
+  return self.modem.open(self.port)
+end
+
+--close port for socket to listen on
+function server:close()
+  return self.modem.close(self.port)
 end
 
 socket.__index = socket
