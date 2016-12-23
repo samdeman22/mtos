@@ -3,6 +3,7 @@
 /usr
 
 #OC specific things
+/home
 /boot
 .osprop
 init.lua
@@ -23,6 +24,11 @@ lib/shell.lua
 lib/sides.lua
 lib/term.lua
 lib/text.lua
+lib/transforms.lua
+lib/guid.lua
+lib/pipes.lua
+lib/sh.lua
+lib/tools/
 #/bin
 bin/address.lua
 bin/alias.lua
@@ -66,3 +72,13 @@ bin/useradd.lua
 bin/userdel.lua
 bin/which.lua
 bin/yes.lua
+bin/du.lua
+bin/find.lua
+bin/grep.lua
+bin/head.lua
+bin/mktmp.lua
+bin/rmdir.lua
+bin/sleep.lua
+bin/source.lua
+bin/time.lua
+bin/touch.lua
