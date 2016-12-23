@@ -14,7 +14,7 @@ function server.create(port, handle)
   s.port = port
   s.handle = handle
   --bind the callback to the implementation defined handler
-  s.callback = function (_, _, src, port, _, message) s:handle(src,port,message) end
+  s._callback = function (_, _, src, port, _, message) s:handle(src,port,message) end
   s.modem = component.modem
   return s
 end
@@ -32,11 +32,9 @@ function server:accept_sync(timeout)
   --blocking call, wait for client messages
   if timeout then
     local event, _, src, port, _, message = event.pull(timeout, "modem_message")
-    if event then
-      --print(message.." from "..src.." on port "..port)
+    if event then --otherwise timeout finished...
+      print(message.." from "..src.." on port "..port)
       self:handle(src, port, message)
-    else
-      --todo timeout
     end
   else
     local _, _, src, port, _, message = event.pull("modem_message")
@@ -46,18 +44,15 @@ function server:accept_sync(timeout)
 end
 
 function server:accept_async()
-  self.accepting = true
-  self.modem.open(self.port)
   --asynchronously apply self:handle to incoming messages
-  event.listen("modem_message", self.callback)
+  event.listen("modem_message", self._callback)
 end
 
 --unregister the event listener for modem_message on this callback
 --only this server should have the self:callback reference, others' callback hash
 --should be different.
 function server:stop_async()
-  event.ignore("modem_message", self.callback)
-  self:close()
+  event.ignore("modem_message", self._callback)
 end
 
 --open port for server to listen on
