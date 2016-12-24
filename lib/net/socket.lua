@@ -3,7 +3,6 @@
 -- and recieving data
 
 local component = require("component")
-local event = require("event")
 local serial = require("serialization")
 local server = require("net/server")
 
