@@ -93,4 +93,47 @@ function ntable.flush()
   _G["NET"] = {["table"] = {}}
 end
 
+-- create and return a new simplified version of this rap address
+function ntable.simplify_rap(addr)
+  if not addr then
+    error("can't simplify non rap-address")
+  end
+  local addr = rap.create(addr.subnets)
+  -- if the address is 'me' it is already as simple as possible
+  if #addr.subnets == 1 and addr.subnets[1] == std.net.rap.me then
+    -- return a copy
+    return addr
+  end
+  local done = false
+  -- remove 'me' segments, except in the case where 'me' is the only segment
+  -- TODO this could be a lot more efficient somehow
+  while not done do
+    for i, subnet in ipairs(addr.subnets) do
+      if subnet == std.net.rap.me then
+        -- remove the segment
+        addr = addr:remove(i)
+        break
+      elseif i == #addr.subnets then
+        -- we've scanned to the end of the currently modified address, and found no problems..
+        done = true
+      end
+    end
+  end
+  done = false
+  while not done do
+    -- short-circuit 'mt' segments - 'mt' always points to the root, and will find its way there
+    for i, subnet in ipairs(addr.subnets) do
+      if subnet == std.net.rap.mt then
+        addr = addr:head(#addr.subnets - i + 1)
+      elseif i == #addr.subnets then
+        -- we've scanned to the end of the currently modified address, and found no problems..
+        done = true
+      end
+    end
+  end
+  -- resolve loops: count the number of indirections vs the number of 'up' segments
+  -- TODO
+  return addr
+end
+
 return ntable
