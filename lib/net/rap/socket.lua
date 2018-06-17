@@ -2,7 +2,7 @@
 -- built on top of modhandle, RAP and NET for easy rap-level networking
 
 local serial = require("serialization")
-local net = require("net/table")
+local net = require("net/ntable")
 local rap = require("net/rap")
 local socket = require("net/socket")
 local socket = {}

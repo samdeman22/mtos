@@ -3,7 +3,7 @@
 
 --imports
 local std = require("std")
-local ntable = require("net/table")
+local ntable = require("net/ntable")
 local nhandle = require("net/handle")
 local coroutine = require("coroutine")
 
@@ -32,7 +32,7 @@ end)
 local running = false
 
 --define main running routine
-local function main
+local function main()
   ntable.load()
   while running do
     if not nh.accepting and _G["FLAG"].NETME_LISTEN then

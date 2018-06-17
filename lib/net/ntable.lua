@@ -2,7 +2,8 @@
 -- api to access and interact with the global NET table
 
 local std = require("std")
-local rap = require("rap")
+local rap = require("net/rap")
+local nhandle = require("net/handle")
 local fs = require("filesystem")
 local serial = require("serialization")
 
@@ -12,8 +13,17 @@ local ntable = {}
 --global environment net table
 if not _G["NET"] then _G["NET"] = {table = {}} end
 
-function ntable.init(mt, ex, me, table)
-  _G["NET"] = {["mt"] = mt, ["ex"] = ex, ["me"] = me, ["table"] = table}
+function ntable.isreserved(entry)
+  return entry == "up"
+  or entry == "mt"
+  or entry == "me"
+  or entry == std.net.rap.up
+  or entry == std.net.rap.mt
+  or entry == std.net.rap.me
+end
+
+function ntable.init(mt, up, me, table)
+  _G["NET"] = {["mt"] = mt, ["up"] = up, ["me"] = me, ["table"] = table}
 end
 
 --loads the NET table from /var/NET, sets the global table and returns it; if it exists
@@ -36,8 +46,7 @@ end
 -- get hard address from NET table based on entry
 -- expect entry as either: "ex", "mt", "me"; or an arbitrary string/number
 function ntable.get(entry)
-  if entry == "ex" or entry == "mt" or entry == "me"
-  or entry == 127 or entry == 331 or entry == 316 then
+  if ntable.isreserved(entry) then
     return _G["NET"][entry]
   elseif type(entry) == "string" then
     return _G["NET"].table[rap.base10(entry)]
@@ -50,8 +59,7 @@ end
 
 --
 function ntable.update(entry, value)
-  if entry == "ex" or entry == "mt" or entry == "me"
-  or entry == 127 or entry == 331 or entry == 316 then
+  if ntable.isreserved(entry) then
     _G["NET"][entry] = value
     return true
   elseif entry then

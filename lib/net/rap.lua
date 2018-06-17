@@ -81,7 +81,7 @@ function rap.fromarray(arr)
   local r = {}
   assert(#arr > 0, "array is not a valid RAP subnet array")
   for k,item in pairs(arr) do
-    assert(type(item) == "number" and item >= 0 and item <= 765, "array is not a valid RAP subnet array")
+    assert(type(item) == "number" and item >= rap.MIN and item <= rap.MAX, "array is not a valid RAP subnet array")
   end
   return rap.create(arr)
 end
@@ -122,10 +122,10 @@ function rap.fromstring(str)
         subnets[offset + i + j - 1] = rap.base10(alphas[j])
       end
       offset = #alphas > 1 and offset + #alphas - 1 or offset
-    elseif n and n >= 0 and n <= 765 then
+    elseif n and n >= rap.MIN and n <= rap.MAX then
       subnets[offset + i] = n
     else
-      error("string "..str.." is not a valid RAP address\n subnet "..groups[i].." is either not a number between 0 and 765 inclusive, or one or more two digit alphabet strings (e.g. 'aa' or 'zz')")
+      error("string "..str.." is not a valid RAP address\n subnet "..groups[i].." is either not a number between "..rap.MIN.." and "..rap.MAX.." inclusive, or one or more two digit alphabet strings (e.g. '"..rap.base26(rap.MIN, 2).."' or '"..rap.base26(rap.MAX).."')")
     end
 
     i = i + 1
@@ -194,5 +194,14 @@ function rap:tail(n)
   end
   return r
 end
+
+rap.SEGMENT_LENGTH = 2
+rap.MIN = 0 -- minimum valid RAP segment address
+-- create a string representing the maximum rap segment address
+local s = ""
+for i = 1, rap.SEGMENT_LENGTH do
+  s = s.."z"
+end
+rap.MAX = rap.base10(s) -- maximum valid RAP segment address
 
 return rap

@@ -5,6 +5,8 @@
 local component = require("component")
 local event = require("event")
 local serial = require("serialization")
+local std = require("std").net.server
+local util_values = require("util/values")
 
 local server = {}
 server.__index = server
@@ -14,7 +16,7 @@ function server.create(port, handle)
   s.port = port
   s.handle = handle
   --bind the callback to the implementation defined handler
-  s._callback = function (_, _, src, port, _, message) s:handle(src,port,message) end
+  s.callback = function (_, _, src, port, _, message) s.handle(src,port,message) end
   s.modem = component.modem
   return s
 end
@@ -26,43 +28,39 @@ function server:send(addr, port, ...)
   self.modem.send(addr, port, arg)
 end
 
---start listening; will call the provided handler on the client message
---will end when once a client message has been dealt with
+--start the accepting loop, will call the provided handler on the client packet
+--will end when self.accepting is set to false
 function server:accept_sync(timeout)
+  self.modem.open(self.port)
+  --print("waiting for clients")
   --blocking call, wait for client messages
   if timeout then
     local event, _, src, port, _, message = event.pull(timeout, "modem_message")
-    if event then --otherwise timeout finished...
-      print(message.." from "..src.." on port "..port)
+    if event then
       self:handle(src, port, message)
+    else
+      --todo timeout
     end
   else
-    local _, _, src, port, _, message = event.pull("modem_message")
-    --print(message.." from "..src.." on port "..port)
+    local event, _, src, port, _, message = event.pull(nil, "modem_message")
     self:handle(src, port, message)
   end
+  self.modem.close(self.port)
 end
 
 function server:accept_async()
+  self.accepting = true
+  self.modem.open(self.port)
   --asynchronously apply self:handle to incoming messages
-  event.listen("modem_message", self._callback)
+  event.listen("modem_message", self.callback)
 end
 
 --unregister the event listener for modem_message on this callback
 --only this server should have the self:callback reference, others' callback hash
 --should be different.
-function server:stop_async()
-  event.ignore("modem_message", self._callback)
-end
-
---open port for server to listen on
-function server:open()
-  return self.modem.open(self.port)
-end
-
---close port for server to listen on
-function server:close()
-  return self.modem.close(self.port)
+function server:close_async()
+  event.ignore("modem_message", self.callback)
+  self.modem.close(self.port)
 end
 
 return server

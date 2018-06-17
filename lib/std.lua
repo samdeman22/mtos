@@ -11,9 +11,13 @@ std.sigs = {
 }
 
 --frequent base26 conversion to base10
-std.me = 316
-std.ex = 127
-std.mt = 331
+std["net"] = {
+  ["rap"] = {
+    ["me"] = 316,
+    ["up"] = 535,
+    ["mt"] = 331
+  }
+}
 
 --write any other standard constants in the std table
 
