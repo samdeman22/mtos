@@ -145,28 +145,30 @@ end
 
 --add the subnets of the address to the head (right) of self
 function rap:append(address)
+  local subs = self.subnets
   if address and address.subnets then
-    thislen = #self.subnets
+    local thislen = #subs
     for i = 1, #address.subnets do
-      self.subnets[i + thislen] = address.subnets[i]
+      subs[i + thislen] = address.subnets[i]
     end
   end
-  return self
+  return rap.create(subs)
 end
 
 --add the subnets of address to the tail (left) of self
 function rap:prepend(address)
+  local subs = self.subnets
   if address and address.subnets then
     --move the self address along in index
-    otherlen = #address.subnets
+    local otherlen = #address.subnets
     for i = #self.subnets, 1, -1 do
-      self.subnets[i + otherlen] = self.subnets[i]
+      subs[i + otherlen] = subs[i]
     end
     for i = 1, #address.subnets do
-      self.subnets[i] = address.subnets[i]
+      subs[i] = address.subnets[i]
     end
   end
-  return self
+  return rap.create(subs)
 end
 
 --take n subnets from the head (right) of the address, return a new rap of them
@@ -193,6 +195,21 @@ function rap:tail(n)
     end
   end
   return r
+end
+
+-- remove n segments from the i-th subnet, towards the head (rightwards)
+function rap:remove(i, n)
+  local i = (i and i >= 1) and i or 1
+  local n = (n and n >= 1) and n or 1
+  -- take the head from the right of the hole
+  local head_size = #self.subnets - (i + n) + 1
+  local tail_size = i - 1
+  --print("head size: "..head_size.." | tail size: "..tail_size)
+  local right = (head_size < 1 and rap.create({})) or self:head(head_size)
+  -- ...and the tail from the left of the hole
+  local left = (tail_size < 1 and rap.create({})) or self:tail(tail_size)
+  --print("left: "..left:tostring().." | right: "..right:tostring())
+  return left:append(right)
 end
 
 rap.SEGMENT_LENGTH = 2
