@@ -3,9 +3,18 @@
 
 --imports
 local std = require("std")
-local ntable = require("net/ntable")
+local ntable = require("net")
 local nhandle = require("net/handle")
 local coroutine = require("coroutine")
+
+--[[
+
+`netmt` is a daemon designed to run on dedicated root hardware. It's chief task
+is to route requests from lower nodes; track traffic; as well as any standard
+NET or DFLT requests. The MT node has ultimate authority over naming of lower
+nodes.
+
+]]
 
 --recieving messages on the NET port
 local nh = nhandle.create(std.ports.NET, function(self, src, port, message) --on client handle

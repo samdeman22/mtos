@@ -3,7 +3,7 @@
 
 --imports
 local std = require("std")
-local ntable = require("net/ntable")
+local ntable = require("net")
 local nhandle = require("net/handle")
 local coroutine = require("coroutine")
 
